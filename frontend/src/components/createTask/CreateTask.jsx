@@ -5,32 +5,35 @@ import TokenContext from '../../context/TokenContext';
 import axios from "../../Axios/axios.js"
 import "./createTask.css"
 function CreateTask() {
-    const { dispatch } = useContext(TaskContext)
-    const {userToken} = useContext(TokenContext)
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    // const [toast, setToast] = useState();
+    const { dispatch } = useContext(TaskContext);
+    const { userToken } = useContext(TokenContext);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [deadline, setDeadline] = useState("");  // New state for deadline
+
     const handleAdd = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("/task/addTask", {title, description},{
-              headers: {
-                Authorization: `Bearer ${userToken}`
-              }
-            })
-            //setToast(res.data)
-            // showToast();
-          } catch (error) {
+            const res = await axios.post("/task/addTask", { title, description, deadline }, {
+                headers: {
+                    Authorization: `Bearer ${userToken}`
+                }
+            });
+            console.log(res.data);  // Use the response here
+            
+        } catch (error) {
             console.log(error);
-          }
+        }
         dispatch({
             type: "ADD_TASK",
             title,
-            description
-        })
-        setTitle("")
-        setDescription("")
-    }
+            description,
+            deadline  // Include deadline in local state
+        });
+        setTitle("");
+        setDescription("");
+        setDeadline("");  // Reset deadline
+    };
 
     // const showToast = () => {
     //     const toast = document.getElementById('toast');
@@ -67,6 +70,10 @@ function CreateTask() {
                             onChange={(e) => setDescription(e.target.value)}
                             style={{ resize: "none" }}
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' />
+                    </div>
+                    <div className='my-3'>
+                        <label htmlFor="deadline">Deadline</label>
+                        <input type="datetime-local" value={deadline} required onChange={(e) => setDeadline(e.target.value)} className='inputField' />
                     </div>
                     <div className='flex justify-center'>
                         <button

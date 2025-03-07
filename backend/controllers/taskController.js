@@ -1,6 +1,7 @@
 import taskModel from "../models/taskModel.js";
 import userModel from "../models/userModel.js";
 import { createTransport } from 'nodemailer';
+import moment from "moment";
 import dotenv from "dotenv";
 dotenv.config();
 const sendMail = (email, subject, title, description) => {
@@ -12,8 +13,10 @@ const sendMail = (email, subject, title, description) => {
         }
     });
 
+    console.log("transpoter deatilas", transporter)
+
     var mailOptions = {
-        from: 'alok.yadav6000@gmail.com',
+        from: 'irfaanahamed505@gmail.com',
         to: email,
         subject: subject,
         html:`<h1>Task added successfully</h1><h2>Title: ${title}</h2><h3>Description: ${description}</h3>`
@@ -45,11 +48,13 @@ const addTask = async (req, res) => {
         )
 }
 const removeTask = (req, res) => {
-    const { id } = req.body;
+    console.log("entered into remove task end point");
+    const { id } = req.params;  // Extract ID from params, not body
     console.log("id: ", id);
+
     taskModel.findByIdAndDelete(id)
         .then(() => res.status(200).json({ message: "Task deleted successfully" }))
-        .catch((error) => res.status(501).json({ message: error.message }))
+        .catch((error) => res.status(501).json({ message: error.message }));
 }
 
 const getTask = (req, res) => {
@@ -57,4 +62,18 @@ const getTask = (req, res) => {
         .then((data) => res.status(200).json(data))
         .catch((error) => res.status(501).json({ message: error.message }))
 }
-export { addTask, getTask,removeTask }
+
+const getExpiredTasks = async (req, res) => {
+    try {
+        const thirtyMinutesAgo = moment().subtract(30, "minutes").toDate();
+        const tasks = await taskModel.find({
+            userId: req.user.id,
+            completed: false,
+            updatedAt: { $lte: thirtyMinutesAgo } // Assuming 'updatedAt' is used to track last modification
+        });
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+export { addTask, getTask,removeTask ,getExpiredTasks}
