@@ -22,19 +22,22 @@ const forgotPassword = async (req, res) => {
     
     //Send email with reset token
     const resetUrl = `https://todo-app-b96a5.web.app/resetPassword?token=${resetToken}`;
-    var transporter = createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: process.env.GMAIL_USERNAME,
-            pass: process.env.GMAIL_PASSWORD
-        }
-    });
+    const transporter = createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+          user: process.env.GMAIL_USERNAME,
+          pass: process.env.GMAIL_PASSWORD
+      },
+      logger: true,   // Add this to log SMTP interactions
+      debug: true     // Enable debugging output
+  });
+  
 
     var mailOptions = {
-        from: 'alok.yadav6000@gmail.com',
+        from: process.env.GMAIL_USERNAME,
         to: email,
         subject: "Reset Password",
         html:`<h1>Reset Password</h1><h2>Click on the link to reset your password</h2><h3>${resetUrl}</h3>`
