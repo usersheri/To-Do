@@ -33,6 +33,10 @@ const connectDB = async () => {
 };
 connectDB();
 
+app.get("/", (req, res) => {
+    res.send("I am batman!");
+});
+
 // API endpoints
 app.use("/api/user", userRouter);
 app.use("/api/task", taskRouter);
